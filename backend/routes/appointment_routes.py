@@ -7,7 +7,6 @@ from typing import Optional
 
 router = APIRouter()
 
-# --- Schemas ---
 class AppointmentRequest(BaseModel):
     user_id: int
     doctor_name: str
@@ -21,7 +20,6 @@ class MedicalRecordRequest(BaseModel):
     prescription: Optional[str] = None
     notes: Optional[str] = None
 
-# --- Book Appointment ---
 @router.post("/book")
 def book_appointment(request: AppointmentRequest, db: Session = Depends(get_db)):
     appointment = Appointment(
@@ -36,13 +34,20 @@ def book_appointment(request: AppointmentRequest, db: Session = Depends(get_db))
     db.refresh(appointment)
     return {"message": "Appointment booked successfully! ✅", "id": appointment.id}
 
-# --- Get Appointments ---
 @router.get("/list/{user_id}")
 def get_appointments(user_id: int, db: Session = Depends(get_db)):
     appointments = db.query(Appointment).filter(Appointment.user_id == user_id).all()
     return appointments
 
-# --- Add Medical Record ---
+@router.put("/cancel/{appointment_id}")
+def cancel_appointment(appointment_id: int, db: Session = Depends(get_db)):
+    appointment = db.query(Appointment).filter(Appointment.id == appointment_id).first()
+    if not appointment:
+        raise HTTPException(status_code=404, detail="Appointment not found")
+    appointment.status = "cancelled"
+    db.commit()
+    return {"message": "Appointment cancelled successfully! ✅"}
+
 @router.post("/medical-record")
 def add_medical_record(request: MedicalRecordRequest, db: Session = Depends(get_db)):
     record = MedicalRecord(
@@ -56,7 +61,6 @@ def add_medical_record(request: MedicalRecordRequest, db: Session = Depends(get_
     db.refresh(record)
     return {"message": "Medical record added successfully! ✅"}
 
-# --- Get Medical Records ---
 @router.get("/medical-records/{user_id}")
 def get_medical_records(user_id: int, db: Session = Depends(get_db)):
     records = db.query(MedicalRecord).filter(MedicalRecord.user_id == user_id).all()
