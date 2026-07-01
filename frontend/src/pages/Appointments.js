@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 function Appointments() {
   const [doctorName, setDoctorName] = useState('');
+  const [patientName, setPatientName] = useState('');
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
   const [reason, setReason] = useState('');
@@ -12,13 +13,14 @@ function Appointments() {
   const navigate = useNavigate();
 
   const bookAppointment = async () => {
-    if (!doctorName || !date || !time || !reason) {
+    if (!doctorName || !date || !time || !reason || !patientName) {
       setMessage('Please fill all fields! ❌');
       return;
     }
     try {
       await axios.post('http://localhost:8000/appointments/book', {
         user_id: 1,
+        patient_name: patientName,
         doctor_name: doctorName,
         appointment_date: date,
         appointment_time: time,
@@ -70,6 +72,7 @@ function Appointments() {
           <h3 style={{color:'#1a5276',marginBottom:'20px'}}>📅 Book Appointment</h3>
           {message && <div style={{background: message.includes('❌') ? '#ffe0e0' : '#d5f5e3',color: message.includes('❌') ? '#c0392b' : '#1e8449',padding:'10px',borderRadius:'8px',marginBottom:'15px'}}>{message}</div>}
           <input style={inputStyle} type="text" placeholder="👨‍⚕️ Doctor Name" value={doctorName} onChange={e => setDoctorName(e.target.value)} />
+          <input style={inputStyle} type="text" placeholder="👤 Your Name" value={patientName} onChange={e => setPatientName(e.target.value)} />
           <input style={inputStyle} type="date" value={date} onChange={e => setDate(e.target.value)} />
           <input style={inputStyle} type="time" value={time} onChange={e => setTime(e.target.value)} />
           <textarea style={{...inputStyle, height:'80px'}} placeholder="📝 Reason for visit" value={reason} onChange={e => setReason(e.target.value)} />

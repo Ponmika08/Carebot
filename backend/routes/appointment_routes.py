@@ -9,6 +9,7 @@ router = APIRouter()
 
 class AppointmentRequest(BaseModel):
     user_id: int
+    patient_name: str
     doctor_name: str
     appointment_date: str
     appointment_time: str
@@ -24,6 +25,7 @@ class MedicalRecordRequest(BaseModel):
 def book_appointment(request: AppointmentRequest, db: Session = Depends(get_db)):
     appointment = Appointment(
         user_id=request.user_id,
+        patient_name=request.patient_name,
         doctor_name=request.doctor_name,
         appointment_date=request.appointment_date,
         appointment_time=request.appointment_time,
@@ -47,7 +49,17 @@ def cancel_appointment(appointment_id: int, db: Session = Depends(get_db)):
     appointment.status = "cancelled"
     db.commit()
     return {"message": "Appointment cancelled successfully! ✅"}
+class StatusUpdate(BaseModel):
+    status: str
 
+@router.put("/update-status/{appointment_id}")
+def update_status(appointment_id: int, request: StatusUpdate, db: Session = Depends(get_db)):
+    appointment = db.query(Appointment).filter(Appointment.id == appointment_id).first()
+    if not appointment:
+        raise HTTPException(status_code=404, detail="Appointment not found")
+    appointment.status = request.status
+    db.commit()
+    return {"message": "Status updated! ✅"}
 @router.post("/medical-record")
 def add_medical_record(request: MedicalRecordRequest, db: Session = Depends(get_db)):
     record = MedicalRecord(

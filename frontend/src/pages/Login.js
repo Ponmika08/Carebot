@@ -10,15 +10,19 @@ function Login() {
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-    setLoading(true);
     try {
       const res = await axios.post('http://localhost:8000/auth/login', { email, password });
       localStorage.setItem('token', res.data.access_token);
-      navigate('/dashboard');
+      const role = res.data.role;
+      localStorage.setItem('role', role);
+      if (role === 'doctor') {
+        navigate('/doctor-dashboard');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       setError('Invalid email or password!');
     }
-    setLoading(false);
   };
 
   return (

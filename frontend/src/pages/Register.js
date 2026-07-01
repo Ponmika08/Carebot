@@ -7,6 +7,7 @@ function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [role, setRole] = useState('patient');
   const navigate = useNavigate();
 
   const handleRegister = async () => {
@@ -15,7 +16,8 @@ function Register() {
         full_name: fullName,
         email: email,
         password: password,
-        role: 'patient'
+        role: role
+      
       });
       alert('Registered! Please login.');
       navigate('/');
@@ -39,6 +41,10 @@ function Register() {
         <input style={input} type="text" placeholder="Full Name" value={fullName} onChange={e => setFullName(e.target.value)} />
         <input style={input} type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
         <input style={input} type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
+        <select style={input} value={role} onChange={e => setRole(e.target.value)}>
+  <option value="patient">👤 Patient</option>
+  <option value="doctor">👨‍⚕️ Doctor</option>
+</select>
         <button style={btn} onClick={handleRegister}>Create Account</button>
         <p style={{color:'#888',marginTop:'20px'}}>Already have an account? <span style={{color:'#2d7dd2',cursor:'pointer'}} onClick={() => navigate('/')}>Login</span></p>
       </div>

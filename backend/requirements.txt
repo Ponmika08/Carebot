@@ -7,4 +7,4 @@ passlib
 python-dotenv
 bcrypt==4.0.1
 groq
-google-genai
+google-genaigit 
